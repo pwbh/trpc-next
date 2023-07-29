@@ -1,4 +1,6 @@
+import '@/styles/reset.min.css';
 import '@/styles/globals.css';
+
 import { trpc } from '@/utils/trpc';
 import type { AppProps } from 'next/app';
 

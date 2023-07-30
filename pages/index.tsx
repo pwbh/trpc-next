@@ -1,11 +1,15 @@
-import { useSession, signIn } from 'next-auth/react';
+import { GetServerSideProps } from 'next';
+import { getServerSession } from 'next-auth';
+import { signIn, signOut } from 'next-auth/react';
 import Head from 'next/head';
-import Link from 'next/link';
+
 import styled, { keyframes } from 'styled-components';
+import { authOptions } from './api/auth/[...nextauth]';
+import Image from 'next/image';
 
 const ColorChangeAnime = keyframes`
   0% {
-    color: yellow;
+    color: orange;
   }
   33% {
     color: green;
@@ -14,28 +18,44 @@ const ColorChangeAnime = keyframes`
     color: blue;
   }
   100% {
-    color: yellow;
+    color: orange;
   }
 `;
 
-const Text = styled.h1`
+const Text = styled.span`
   animation: ${ColorChangeAnime} 4s infinite;
-  font-size: 32px;
   color: green;
+  text-align: center;
 `;
 
 const Content = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
+  padding: 15px;
+  min-height: calc(100vh - 30px);
+  width: calc(100% - 30px);
   align-items: center;
   justify-content: center;
+
+  & > * {
+    margin-bottom: 15px;
+    &:last-chuld {
+      margin-bottom: 0;
+    }
+  }
 `;
 
-export default function Home() {
-  const { data: session } = useSession();
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session = await getServerSession(req, res, authOptions);
 
+  return {
+    props: {
+      session,
+    },
+  };
+};
+
+export default function Home({ session }: any) {
   return (
     <>
       <Head>
@@ -47,8 +67,16 @@ export default function Home() {
       <Content>
         <Text>tRPC + NextJS + Styled Components Template by @pwbh</Text>
         {!session && <button onClick={() => signIn()}>Login</button>}
-        {session && <span>{session.user?.name}</span>}
-        {session && <Link href="/api/auth/logout">Logout</Link>}
+        {session && <span>{session.user?.email}</span>}
+        {session && (
+          <Image
+            src={session.user?.image}
+            width={64}
+            height={64}
+            alt="avatar"
+          />
+        )}
+        {session && <button onClick={() => signOut()}>Logout</button>}
       </Content>
     </>
   );

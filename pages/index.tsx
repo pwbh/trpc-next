@@ -1,4 +1,4 @@
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useSession, signIn } from 'next-auth/react';
 import Head from 'next/head';
 import Link from 'next/link';
 import styled, { keyframes } from 'styled-components';
@@ -34,7 +34,7 @@ const Content = styled.div`
 `;
 
 export default function Home() {
-  const { user, error, isLoading } = useUser();
+  const { data: session } = useSession();
 
   return (
     <>
@@ -46,13 +46,9 @@ export default function Home() {
       </Head>
       <Content>
         <Text>tRPC + NextJS + Styled Components Template by @pwbh</Text>
-        {!user && !isLoading && !error && (
-          <Link href="/api/auth/login">Login</Link>
-        )}
-        <span>{!user || isLoading ? 'Loading...' : user.nickname}</span>
-        {user && !isLoading && !error && (
-          <Link href="/api/auth/logout">Logout</Link>
-        )}
+        {!session && <button onClick={() => signIn()}>Login</button>}
+        {session && <span>{session.user?.name}</span>}
+        {session && <Link href="/api/auth/logout">Logout</Link>}
       </Content>
     </>
   );

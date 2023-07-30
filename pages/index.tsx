@@ -1,4 +1,8 @@
-import { GetServerSideProps } from 'next';
+import {
+  GetServerSideProps,
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from 'next';
 import { getServerSession } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
 import Head from 'next/head';
@@ -45,8 +49,10 @@ const Content = styled.div`
   }
 `;
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const session = await getServerSession(req, res, authOptions);
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
 
   return {
     props: {
@@ -55,7 +61,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   };
 };
 
-export default function Home({ session }: any) {
+export default function Home({
+  session,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <>
       <Head>
@@ -68,7 +76,7 @@ export default function Home({ session }: any) {
         <Text>tRPC + NextJS + Styled Components Template by @pwbh</Text>
         {!session && <button onClick={() => signIn()}>Login</button>}
         {session && <span>{session.user?.email}</span>}
-        {session && (
+        {session && session.user?.image && (
           <Image
             src={session.user?.image}
             width={64}

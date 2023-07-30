@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { AuthOptions } from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 
@@ -22,9 +22,12 @@ if (process.env.GOOGLE_ID && process.env.GOOGLE_SECRET) {
   );
 }
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
   // Configure one or more authentication providers
   providers,
+  pages: {
+    signIn: '/auth/signin',
+  },
 };
 
 export default NextAuth(authOptions);

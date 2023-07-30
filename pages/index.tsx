@@ -1,4 +1,6 @@
+import { useUser } from '@auth0/nextjs-auth0/client';
 import Head from 'next/head';
+import Link from 'next/link';
 import styled, { keyframes } from 'styled-components';
 
 const ColorChangeAnime = keyframes`
@@ -24,6 +26,7 @@ const Text = styled.h1`
 
 const Content = styled.div`
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   width: 100%;
   align-items: center;
@@ -31,6 +34,8 @@ const Content = styled.div`
 `;
 
 export default function Home() {
+  const { user, error, isLoading } = useUser();
+
   return (
     <>
       <Head>
@@ -41,6 +46,13 @@ export default function Home() {
       </Head>
       <Content>
         <Text>tRPC + NextJS + Styled Components Template by @pwbh</Text>
+        {!user && !isLoading && !error && (
+          <Link href="/api/auth/login">Login</Link>
+        )}
+        <span>{!user || isLoading ? 'Loading...' : user.nickname}</span>
+        {user && !isLoading && !error && (
+          <Link href="/api/auth/logout">Logout</Link>
+        )}
       </Content>
     </>
   );
